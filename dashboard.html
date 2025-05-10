@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- ... your navbar ... -->
+        <div class="dashboard-content">
+            <h2>Your Resume Analysis</h2>
+
+            <h3>Extracted Skills:</h3>
+            <ul>
+                {% for skill in extracted_skills %}
+                <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Suggested Skills:</h3>
+            <ul>
+                {% for skill in suggested_skills %}
+                <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+
+            <h3>Roadmap:</h3>
+            <pre>{{ roadmap }}</pre>
+        </div>
+    </div>
+</body>
+</html>
