@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KaushalX is a learning platform that helps you upskill and find new opportunities.">
+    <title>KaushalX - Learning Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<!-- Login Page -->
+<div id="loginPage" class="page">
+    <div class="login-container">
+        <h1>KaushalX</h1>
+        <p>Where Learning Meets Opportunity</p>
+        <h2>Log in</h2>
+        <p>Need a KaushalX account? <a href="#" aria-label="Create an account">create an account</a></p>
+        <form id="loginForm">
+            <input type="text" placeholder="Username or Email" id="loginUsername" required aria-label="Username or Email">
+            <input type="password" placeholder="Password" id="loginPassword" required aria-label="Password">
+            <button type="submit" aria-label="Log in">Log in</button>
+        </form>
+        <p id="loginError" style="color: red;"></p>
+        <p><a href="#" aria-label="Forgot username?">Forgot username?</a> <a href="#" aria-label="Forgot password?">Forgot password?</a></p>
+    </div>
+</div>
+
+<!-- Resume Upload / Skills Input Page -->
+<div id="resumePage" class="page hidden">
+    <div class="container">
+        <h2>Enter Your Skills or Upload Resume</h2>
+        <form id="skillsForm" method="POST" action="/submit" enctype="multipart/form-data">
+            <label for="skills">Enter your skills (comma-separated):</label>
+            <input type="text" id="skills" name="skills" placeholder="e.g., Python, Machine Learning, Java" required aria-label="Enter your skills">
+            <p>OR</p>
+            <label for="resume">Upload Your Resume (PDF only):</label>
+            <input type="file" id="resume" name="resume" accept=".pdf" required aria-label="Upload Your Resume">
+            <button type="submit">Submit</button>
+        </form>
+        <p id="resumeError" style="color: red;"></p>
+    </div>
+</div>
+
+<!-- Dashboard Page -->
+<div id="dashboardPage" class="page hidden">
+    <div class="dashboard">
+        <nav class="navbar">
+            <ul>
+                <li><a href="#" id="homeLink" aria-label="Home">Home</a></li>
+                <li><a href="#" id="upskillingLink" aria-label="Upskilling Courses">Upskilling Courses</a></li>
+                <li><a href="#" id="resumeAnalysisLink" aria-label="Resume Analysis">Resume Analysis</a></li>
+                <li><a href="#" id="logoutLink" aria-label="Logout">Logout</a></li>
+            </ul>
+        </nav>
+        <div class="dashboard-content">
+            <h2>Welcome to Your Dashboard</h2>
+            <p>Get job insights, upskill, and analyze your resume to find the best opportunities!</p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
