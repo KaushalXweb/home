@@ -5,12 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="KaushalX is a learning platform that helps you upskill and find new opportunities.">
     <title>KaushalX - Learning Platform</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
-<!-- Login Page -->
-<div id="loginPage" class="page">
+<div id="loginPage" class="page active">
     <div class="login-container">
         <h1>KaushalX</h1>
         <p> Where Learning Meets Opportunity</p>
@@ -26,40 +25,24 @@
     </div>
 </div>
 
-<!-- Resume Upload / Skills Input Page -->
-<div id="resumePage" class="page hidden">
+<div id="resumePage" class="page">
     <div class="container">
         <h2>Enter Your Skills or Upload Resume</h2>
         <form id="skillsForm" method="POST" action="/submit" enctype="multipart/form-data">
             <label for="skills">Enter your skills (comma-separated):</label>
-            <input type="text" id="skills" name="skills" placeholder="e.g., Python, Machine Learning, Java" required aria-label="Enter your skills">
-            <p>OR</p>
+            <input type="text" id="skills" name="skills" placeholder="e.g., Python, Machine Learning, Java" aria-label="Enter your skills">
+            
+            <div style="margin: 15px 0; font-weight: bold;">OR</div>
+            
             <label for="resume">Upload Your Resume (PDF only):</label>
-            <input type="file" id="resume" name="resume" accept=".pdf" required aria-label="Upload Your Resume">
-            <button type="submit">Submit</button>
+            <input type="file" id="resume" name="resume" accept=".pdf" aria-label="Upload Your Resume">
+            
+            <button type="submit" style="margin-top: 20px;">Analyze Now</button>
         </form>
         <p id="resumeError" style="color: red;"></p>
     </div>
 </div>
 
-<!-- Dashboard Page -->
-<div id="dashboardPage" class="page hidden">
-    <div class="dashboard">
-        <nav class="navbar">
-            <ul>
-                <li><a href="#" id="homeLink" aria-label="Home">Home</a></li>
-                <li><a href="#" id="upskillingLink" aria-label="Upskilling Courses">Upskilling Courses</a></li>
-                <li><a href="#" id="resumeAnalysisLink" aria-label="Resume Analysis">Resume Analysis</a></li>
-                <li><a href="#" id="logoutLink" aria-label="Logout">Logout</a></li>
-            </ul>
-        </nav>
-        <div class="dashboard-content">
-            <h2>Welcome to Your Dashboard</h2>
-            <p>Get job insights, upskill, and analyze your resume to find the best opportunities!</p>
-        </div>
-    </div>
-</div>
-
-<script src="script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
