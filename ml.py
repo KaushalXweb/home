@@ -1,13 +1,14 @@
 import os
-import re
-from typing import List
-import google.generativeai as genai
-from dotenv import load_dotenv
 import PyPDF2
+from groq import Groq
+from dotenv import load_dotenv
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-pro-latest")
+
+# Initialize the Groq client
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# Using Llama-3.3-70b for high reasoning quality, similar to Gemini Pro
+MODEL_NAME = "llama-3.3-70b-versatile"
 
 def extract_text_from_pdf(pdf_file):
     text = ""
@@ -19,6 +20,22 @@ def extract_text_from_pdf(pdf_file):
         print(f"Error extracting text from PDF: {e}")
         return None
     return text
+
+def get_groq_response(prompt):
+    """Helper function to handle Groq API calls"""
+    try:
+        chat_completion = client.chat.completions.create(
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt,
+                }
+            ],
+            model=MODEL_NAME,
+        )
+        return chat_completion.choices[0].message.content
+    except Exception as e:
+        return f"Error: {str(e)}"
 
 def extract_skills_from_resume(resume_text):
     prompt = f"""
@@ -33,26 +50,19 @@ def extract_skills_from_resume(resume_text):
     - Skill 2
     - Skill 3
     """
-    try:
-        response = model.generate_content(prompt)
-        return response.text
-    except google.generativeai.types.generation_types.BlockedPromptException as e:
-        return f"Error: The prompt was blocked: {str(e)}"
-    except Exception as e:
-        return f"An unexpected error occurred: {str(e)}"
+    return get_groq_response(prompt)
 
 def format_skills(skills_text):
     skills = []
     for line in skills_text.split("\n"):
-        skill = line.strip("- ").strip()  # Remove leading/trailing spaces and hyphens
-        if skill:  # Check if the line is not empty
+        skill = line.strip("- ").strip()
+        if skill:
             skills.append(skill)
     return skills
 
 def suggest_additional_skills(existing_skills):
     prompt = f"""
-    Based on the following skills, suggest a comprehensive list of additional skills 
-    (20-30) that are highly valuable in the job market. Focus on:
+    Based on the following skills, suggest a comprehensive list of additional skills (20-30) that are highly valuable in the job market. Focus on:
     - Related technical skills
     - Current industry trends
     - In-demand tools and frameworks
@@ -60,105 +70,58 @@ def suggest_additional_skills(existing_skills):
     - Emerging technologies
 
     Existing Skills:
-    {', '.join(existing_skills)}
+    {', '.join(existing_skills) if isinstance(existing_skills, list) else existing_skills}
 
     Format the response only as a list (each skill prefixed with "- "). Do not provide explanations or categories.
     """
+    
+    response_text = get_groq_response(prompt)
+    
+    if "Error:" in response_text:
+        return [response_text]
 
-    try:
-        response = model.generate_content([prompt])
+    lines = response_text.split("\n")
+    suggested_skills_list = []
+    for line in lines:
+        line = line.strip()
+        if line.startswith("- "):
+            skill = line[2:].strip()
+            if skill:
+                suggested_skills_list.append(skill)
 
-        if response and hasattr(response, "text"):
-            # ✅ Clean and parse the response to extract skills
-            lines = response.text.split("\n")
-            suggested_skills_list = []
-            for line in lines:
-                line = line.strip()
-                if line.startswith("- "):
-                    skill = line[2:].strip()
-                    if skill and skill not in existing_skills:
-                        suggested_skills_list.append(skill)
-
-            # ✅ Remove duplicates
-            suggested_skills_list = list(dict.fromkeys(suggested_skills_list))
-            return suggested_skills_list
-
-        return ["Error: No response from model."]
-    except google.generativeai.types.generation_types.BlockedPromptException as e:
-        return [f"Error: The prompt was blocked: {str(e)}"]
-    except Exception as e:
-        return [f"An unexpected error occurred: {str(e)}"]
+    return list(dict.fromkeys(suggested_skills_list))
 
 def get_top_3_in_demand_skills():
     prompt = """
     Identify the top 3 most in-demand skills in the global job market.
-    Focus on skills that offer high growth potential, are sought after by employers across industries, 
-    and are useful in a wide range of roles.
-
     Format:
     - Skill 1
     - Skill 2
     - Skill 3
-
     Do NOT include any explanations.
     """
+    response_text = get_groq_response(prompt)
+    
+    if "Error:" in response_text:
+        return [response_text]
 
-    try:
-        response = model.generate_content([prompt])
-
-        if response and hasattr(response, "text"):
-            # ✅ Extract and clean top 3 skills
-            lines = response.text.split("\n")
-            top_skills = []
-            for line in lines:
-                line = line.strip()
-                if line.startswith("- "):
-                    skill = line[2:].strip()
-                    if skill:
-                        top_skills.append(skill)
-
-            return top_skills[:3]  # Just to be safe, limit to top 3
-
-        return ["Error: No response from model."]
-    except google.generativeai.types.generation_types.BlockedPromptException as e:
-        return [f"Error: The prompt was blocked: {str(e)}"]
-    except Exception as e:
-        return [f"An unexpected error occurred: {str(e)}"]
+    lines = response_text.split("\n")
+    top_skills = [line[2:].strip() for line in lines if line.strip().startswith("- ")]
+    return top_skills[:3]
 
 def generate_multilingual_roadmap(skill, language):
     prompt = f"""
     Create a complete and structured learning roadmap for the skill: "{skill}".
-
     Respond in: {language}
 
     Requirements:
-    1. Roadmap should be beginner-friendly and advance gradually.
+    1. Roadmap should be beginner-friendly.
     2. For each topic, include:
-        - Topic name
-        - A short description (optional)
-        - 1–2 YouTube video links (working links only)
-        - 1–2 useful website links (tutorials, documentation, or courses from reputable online learning platforms)
+        - Topic: <topic name>
+        - Description: <one-liner>
+        - YouTube Links: - <link>
+        - Website Links: - <link>
 
-    Use clean formatting:
-
-    Topic: <topic name>
-    Description: <one-liner>
-    YouTube Links:
-    - <youtube_link_1>
-    - <youtube_link_2>
-    Website Links:
-    - <website_link_1>
-    - <website_link_2>
-
-    Only include real links that are currently working and relevant. Avoid unnecessary explanation.
+    Only include real links. Avoid unnecessary explanation.
     """
-
-    try:
-        response = model.generate_content([prompt])
-        if response and hasattr(response, "text"):
-            return response.text
-        return "❌ No response from Gemini."
-    except google.generativeai.types.generation_types.BlockedPromptException as e:
-        return f"Error: The prompt was blocked: {str(e)}"
-    except Exception as e:
-        return f"An unexpected error occurred: {str(e)}"
+    return get_groq_response(prompt)
