@@ -183,3 +183,8 @@ wheel==0.45.1
 wrapt==1.17.1
 yapf==0.43.0
 zipp==3.21.0
+flask
+groq
+PyPDF2
+python-dotenv
+gunicorn
