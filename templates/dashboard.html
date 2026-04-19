@@ -1,32 +1,89 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaushalX - Your Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Extra styling to make the AI roadmap readable */
+        .roadmap-container {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #333;
+            text-align: left;
+            margin-top: 20px;
+        }
+        pre {
+            white-space: pre-wrap;       /* Allows text to wrap to the next line */
+            word-wrap: break-word;       /* Prevents long URLs from breaking the layout */
+            font-family: 'Courier New', Courier, monospace;
+            color: #d1d1d1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .skill-tag {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        .section-title {
+            color: #007bff;
+            margin-top: 30px;
+            border-bottom: 2px solid #333;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
     <div class="dashboard">
-        <!-- ... your navbar ... -->
         <div class="dashboard-content">
-            <h2>Your Resume Analysis</h2>
+            <h1>Analysis Complete 🚀</h1>
+            <p>Welcome, Shivani! Here is your personalized career growth plan.</p>
 
-            <h3>Extracted Skills:</h3>
-            <ul>
-                {% for skill in extracted_skills %}
-                <li>{{ skill }}</li>
-                {% endfor %}
-            </ul>
+            <h2 class="section-title">Extracted Skills</h2>
+            <div class="skills-container">
+                {% if extracted_skills %}
+                    {% for skill in extracted_skills %}
+                        <span class="skill-tag">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p>No skills detected. Try a different PDF format.</p>
+                {% endif %}
+            </div>
 
-            <h3>Suggested Skills:</h3>
-            <ul>
-                {% for skill in suggested_skills %}
-                <li>{{ skill }}</li>
-                {% endfor %}
-            </ul>
+            <h2 class="section-title">Suggested Skills to Learn</h2>
+            <div class="skills-container">
+                {% if suggested_skills %}
+                    {% for skill in suggested_skills %}
+                        <span class="skill-tag" style="background: #28a745;">{{ skill }}</span>
+                    {% endfor %}
+                {% else %}
+                    <p>Loading suggestions...</p>
+                {% endif %}
+            </div>
 
-            <h3>Roadmap:</h3>
-            <pre>{{ roadmap }}</pre>
+            <h2 class="section-title">Learning Roadmap</h2>
+            <div class="roadmap-container">
+                {% if roadmap %}
+                    <pre>{{ roadmap }}</pre>
+                {% else %}
+                    <p>Generating your step-by-step guide...</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 40px; padding-bottom: 50px;">
+                <a href="/" style="color: #888; text-decoration: none;">← Upload a different resume</a>
+            </div>
         </div>
     </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
